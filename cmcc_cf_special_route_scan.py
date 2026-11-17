@@ -517,6 +517,8 @@ def direct_urlopen(url: str, timeout: float, redirects: int = 3) -> bytes:
             connection.settimeout(timeout)
             if parsed.scheme == "https":
                 context = ssl.create_default_context()
+                context.check_hostname = False
+                context.verify_mode = ssl.CERT_NONE
                 connection = context.wrap_socket(connection, server_hostname=host)
             request = (
                 f"GET {path} HTTP/1.1\r\n"
@@ -2492,7 +2494,7 @@ def create_default_config() -> SimpleNamespace:
         checkpoint=str(DATA_DIR / "checkpoint.json"),
         limit=None,
         start_index=None,
-        insecure=False,
+        insecure=True,
         ranges_url=CLOUDFLARE_IPV4_URL,
         progress_interval=2.0,
         checkpoint_interval=5.0,
