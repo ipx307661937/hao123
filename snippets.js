@@ -11,7 +11,6 @@ const uuid = "ff594501-2b04-4da8-b554-059e62b12204", aiProxyip = String.fromChar
   port = addr.substring(idx + 2)) : -1 !== (idx = addr.indexOf(".tp")) && -1 === addr.lastIndexOf(":") ? port = addr.substring(idx + 3, addr.indexOf(".", idx + 3)) : -1 !== (idx = addr.lastIndexOf(":")) && (host = addr.substring(0, idx), 
   port = addr.substring(idx + 1)), [host, (port = parseInt(port), isNaN(port) ? defaultPort : port)];
 };
-let fetcher = null;
 const createConnect = (hostname, port, socketOptions, socket = connect({hostname: hostname, port: port}, socketOptions)) => socket.opened.then(() => socket), dohJsonHeaders = {headers: {accept: "application/dns-json"}}, aiDomains = ["chatgpt.com", "openai.com", "oaistatic.com", "oaiusercontent.com", "chat.com", "claude.ai", "claude.com", "anthropic.com", "grok.com", "x.ai", "perplexity.ai", "poe.com", "character.ai", "pi.ai", "you.com", "phind.com", "blackbox.ai", "civitai.com"].map(d => textEncoder.encode(d)), isAiDomain = (addrBytes, addrType) => {
   if (3 !== addrType || !addrBytes) return !1;
   let len = addrBytes.length;
@@ -255,7 +254,7 @@ const createConnect = (hostname, port, socketOptions, socket = connect({hostname
   webSocket.addEventListener("error", close);
 }, xwebHeaders = {"Content-Type": "application/octet-stream", "grpc-status": "0", "X-Accel-Buffering": "no", "Cache-Control": "no-store"};
 export default {async fetch(request) {
-  if (fetcher || (fetcher = request.fetcher), "POST" === request.method && request.headers.get("content-type")?.startsWith("application/grpc")) return (async request => {
+  if ("POST" === request.method && request.headers.get("content-type")?.startsWith("application/grpc")) return (async request => {
     const reader = request.body?.getReader({mode: "byob"});
     if (!reader) return new Response(null, {status: 400});
     const state = {tcpWriter: null, tcpSocket: null, needMore: !1, allowNeedMore: !0, disableSsAead: !0, xwebPipeTo: !0}, bridge = new IdentityTransformStream({highWaterMark: 1048576}), upBridge = new IdentityTransformStream({highWaterMark: 1073741824}), responseWriter = bridge.writable.getWriter(), close = () => {state.xwebPipeTo && (state.xwebPipeTo = !1, reader.cancel().catch(() => {}), responseWriter.close().catch(() => {}));}, writable = {send(chunk) {if (chunk?.byteLength) return responseWriter.write(chunk);}};
